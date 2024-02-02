@@ -53,23 +53,23 @@ def show_password():
     else:
         Password_entry.configure(show="*")
 
-# Register Button Function
-
-
-
 
 # Register window
 def registration_window():
     # Create a new window for registration
-    registration_window = ctk.CTkToplevel()
+    registration_window = ctk.CTkToplevel.focus_set()
     registration_window.title("Registration")
-    registration_window.state("zoomed")
-    global First_name_entry, Last_name_entry, Date_of_birth_entry, Phone_number_entry, Address_entry1, Address_entry2, Email_entry, Password_entry
+    registration_window.state("zoomed")  # Fullscreen
+    registration_window.lift()  # make the window on the top
+    registration_window.grab_set()  # make the window on the top
 
     # Create labels and entry widgets for registration
     # create registration form
     Register_label_1 = ctk.CTkLabel(registration_window, text="REGISTER HERE", font=("Helvetica", 20, "bold"))
     Register_label_1.place(x=45, y=35)
+
+    # Set the scope of Varibles globally
+    global First_name_entry, Last_name_entry, Date_of_birth_entry, Phone_number_entry, Address_entry1, Address_entry2, Email_entry, Password_entry
 
     First_name_entry = ctk.CTkEntry(registration_window, width=200, placeholder_text="First Name", font=("Helvetica", 10))
     First_name_entry.place(x=48, y=90)
@@ -106,6 +106,8 @@ def registration_window():
                                     font=("Helvetica", 12, "bold"))
     register_button.place(x=150, y=450)
 
+
+# Register Button Function
 def register_button_function():
 
     first_name =First_name_entry.get()
@@ -169,10 +171,10 @@ def register_button_function():
                                                 "You are about to enter the following information \n" + message)
                 # if user confirm, the data will be stored in the csv file
                 if result == "yes":
-                    writer.writerow(
-                        [first_name, last_name, date_of_birth, phone_number, address1 + address2, email, password])
+                    writer.writerow([first_name, last_name, date_of_birth, phone_number, address1 + address2, email, password])
                     messagebox.showinfo("Info", message="Account is successfully registered", icon="info")
                 else:
+                    # clear the entry
                     first_name.set("")
                     last_name.set("")
                     date_of_birth.set("")
@@ -182,24 +184,6 @@ def register_button_function():
                     email.set("")
                     password.set("")
 
-
-# Function to search user accounts
-def search_function():
-    search_term = search_entry.get()
-    if not is_present(search_term):
-        messagebox.showerror("Error", "Please enter a search term")
-        return
-
-    with open("user_accounts.csv", "r", newline="") as csvfile:
-        reader = csv.reader(csvfile)
-        data = list(reader)
-
-    found_accounts = [row for row in data[1:] if any(search_term.lower() in col.lower() for col in row)]
-
-    if not found_accounts:
-        messagebox.showinfo("Info", "No matching accounts found")
-    else:
-        display_found_accounts(found_accounts)
 
 
 # Function to display found user accounts
@@ -225,6 +209,7 @@ def display_user_accounts():
         data = list(reader)
 
     if len(data) > 0:
+        # create a new window to display the user account
         display_window = ctk.CTkToplevel(frame_2)
         display_window.title("User Accounts")
         display_window.geometry("800x400")
@@ -246,7 +231,30 @@ def display_user_accounts():
         messagebox.showinfo("User Accounts", "No user accounts found.")
 
 
+# Function to search user accounts
+def search_function():
+    search_term = search_entry.get()
+    # Validate the present of entry
+    if not is_present(search_term):
+        messagebox.showerror("Error", "Please enter a search term")
+        return
+
+    with open("user_accounts.csv", "r", newline="") as csvfile:
+        reader = csv.reader(csvfile)
+        data = list(reader)
+
+    found_accounts = [row for row in data[1:] if any(search_term.lower() in col.lower() for col in row)]
+
+    # check if the account is in the data list
+    if not found_accounts:
+        messagebox.showinfo("Info", "No matching accounts found")
+    else:
+        display_found_accounts(found_accounts)
+
+
+# Search Window
 def search_window():
+    # create a new window for the search
     search_window = ctk.CTkToplevel(frame_2)
     search_window.title("Search User Accounts")
     search_window.geometry("400x200")
@@ -254,10 +262,12 @@ def search_window():
     search_label = ctk.CTkLabel(search_window, text="Enter search term:", font=("Helvetica", 10))
     search_label.pack(pady=10)
 
+    # Set the scope of varible globally
     global search_entry
     search_entry = ctk.CTkEntry(search_window, width=200, font=("Helvetica", 10))
     search_entry.pack(pady=5)
 
+    # create search button
     search_button = ctk.CTkButton(search_window, text="Search", command=search_function, font=("Helvetica", 10))
     search_button.pack(pady=5)
 
@@ -296,8 +306,33 @@ app.title("User Account Management System")
 # Set the background color
 app.configure(bg="lightgray")
 
-frame_1 = ctk.CTkFrame(master=app, width=330, height=430, corner_radius=15)
-frame_1.place(relx=0.23, rely=0.5, anchor=tk.CENTER)
+# create Login Page
+Login_page = ctk.CTkFrame(master=app, width=330, height=430, corner_radius=15)
+Login_page.place(relx=0.23, rely=0.5, anchor=tk.CENTER)
+
+# create login form
+Login_label_1 = ctk.CTkLabel(master=Login_page, text="LOGIN", font=("Helvetica", 20, "bold"))
+Login_label_1.place(x=45, y=40)
+
+Email_entry = ctk.CTkEntry(master=Login_page, width=260, placeholder_text="Email", font=("Helvetica", 10))
+Email_entry.place(x=48, y=120)
+
+Password_entry = ctk.CTkEntry(master=Login_page, width=260, placeholder_text="Password", show="*", font=("Helvetica", 10))
+Password_entry.place(x=48, y=170)
+Password_shown_check = ctk.CTkCheckBox(master=Login_page, text="Show Password", command=show_password, font=("Helvetica", 10))
+Password_shown_check.place(x=48, y=210)
+
+# create login button
+login_button = ctk.CTkButton(master=Login_page, text="Sign In", command=login_button_function, width=260,
+                             font=("Helvetica", 12, "bold"))
+login_button.place(x=48, y=250)
+
+# create a link to register page
+register_label = ctk.CTkLabel(master=Login_page, text="Doesn't have an account? Register", font=("Helvetica", 10), cursor="hand2")
+register_label.place(x=130, y=280)
+
+# Bind the label to the registration window function
+register_label.bind("<Button-1>", lambda event: registration_window())
 
 # create another frame on the right
 frame_2 = ctk.CTkFrame(master=app, width=530, height=530, corner_radius=15)
@@ -306,35 +341,7 @@ frame_2.place(relx=0.76, rely=0.5, anchor=tk.CENTER)
 """
 frame_3 = ctk.CTkFrame(master=app, width=530, height=430, corner_radius=15)
 frame_3.place(relx=0.66, rely=0.5, anchor=tk.CENTER)
-"""
 
-# create login form
-Login_label_1 = ctk.CTkLabel(master=frame_1, text="LOGIN", font=("Helvetica", 20, "bold"))
-Login_label_1.place(x=45, y=40)
-
-Email_entry = ctk.CTkEntry(master=frame_1, width=260, placeholder_text="Email", font=("Helvetica", 10))
-Email_entry.place(x=48, y=120)
-
-Password_entry = ctk.CTkEntry(master=frame_1, width=260, placeholder_text="Password", show="*", font=("Helvetica", 10))
-Password_entry.place(x=48, y=170)
-Password_shown_check = ctk.CTkCheckBox(master=frame_1, text="Show Password", command=show_password,
-                                       font=("Helvetica", 10))
-Password_shown_check.place(x=48, y=210)
-
-register_label = ctk.CTkLabel(master=frame_1, text="Doesn't have an account? Register", font=("Helvetica", 10), cursor="hand2")
-register_label.place(x=130, y=280)
-
-# Bind the label to the registration window function
-register_label.bind("<Button-1>", lambda event: registration_window())
-
-
-# create login button
-login_button = ctk.CTkButton(master=frame_1, text="Sign In", command=login_button_function, width=260,
-                             font=("Helvetica", 12, "bold"))
-login_button.place(x=48, y=250)
-
-
-"""
 # create registration form
 Register_label_1 = ctk.CTkLabel(master=frame_2, text="REGISTER HERE", font=("Helvetica", 20, "bold"))
 Register_label_1.place(x=45, y=35)
