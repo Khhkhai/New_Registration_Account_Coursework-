@@ -1,2 +1,4 @@
-First Name,Last Name,Date Of Birth,Phone Number,Address,Email,Password
-Khin,Khaing,22/02/2003,09987654321,dfibdrgerge,vauyyc3@gmail.com,bveobui2.
+User ID,First Name,Last Name,Date Of Birth,Phone Number,Address,Email,Password,Role,Registration Date
+,,,,,,admin13@gmail.com,P@ssw0rd!,System User,
+UD9332,khin,khai,12/02/2003,09987654321,dvbkduvsdvsiiuv,sdgasg2@gmail.com,evbeuv2$ee,End User
+GV0372,K,Hnin,25/12/2006,09761611266,YangonMyanmar,kvyphxx@gmail.com,ilovekevin<33,End User
