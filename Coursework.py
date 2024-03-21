@@ -1,21 +1,18 @@
-import tkinter as tk
-import customtkinter as ctk
-from tkinter import messagebox
-from tkinter import messagebox as mb
-from tkinter import ttk
-from tkinter import filedialog
 import csv
-import re
-import os.path
-from PIL import Image, ImageTk
-import string
-import random
-import datetime
 import calendar
-from captcha.image import ImageCaptcha
-import PIL.ImageTk
-from PIL import ImageDraw, ImageFont
+import datetime
+import os.path
+import random
+import re
+import string
 
+import customtkinter as ctk
+from tkinter import filedialog, messagebox, ttk
+from tkinter import messagebox as mb
+import tkinter as tk
+from PIL import Image, ImageDraw, ImageFont, ImageTk
+from captcha.image import ImageCaptcha
+from tkcalendar import DateEntry
 
 
 
@@ -36,7 +33,6 @@ app.title("User Account Registration System")
 app.configure(bg="lightgray")
 
 # Store system user's email & password in csv file
-
 # Check if the CSV file exists
 if not os.path.isfile("user_accounts.csv"):
     # Create the CSV file and write the header row
@@ -45,8 +41,8 @@ if not os.path.isfile("user_accounts.csv"):
         writer.writerow(["User ID", "First Name", "Last Name", "Date Of Birth", "Phone Number", "Address", "Email", "Password", "Role", "Registration Date"])
         writer.writerow(["","","","","","","admin13@gmail.com","P@ssw0rd!", "System User", "",""])
 
-# Validation Check Functions
 
+# Validation Check Functions
 # Function to check the presence of data for each entry
 def is_present(value):
     # Check if the value is not an empty string and not None
@@ -85,6 +81,7 @@ def is_valid_password(password):
     )
 
 
+# Login window
 def Login_page_function():
     # Function to direct to Registration Page
     def forward_to_registration_page():
@@ -170,7 +167,7 @@ def Login_page_function():
 
 
 # Register window
-def registration_page_functioin():
+def registration_page_function():
     # function to move back to login page
     def forward_to_login_page():
         registration_page.destroy()
@@ -225,6 +222,7 @@ def registration_page_functioin():
 
     # Function to generate CAPTCHA image and return as a PIL Image
     def generate_captcha_image():
+        global captcha_text
         captcha_obj = ImageCaptcha(height=100, width=250)
         captcha_text = generate_captcha_text()
         captcha_image = captcha_obj.generate(captcha_text)
@@ -283,9 +281,6 @@ def registration_page_functioin():
                 is_present(password)
                 ):
             messagebox.showinfo("Error", "All data must be entered")
-
-        elif not is_valid_date_of_birth(date_of_birth):
-            messagebox.showinfo("Error", "Date Of Birth: Invalid Format")
 
         elif not is_valid_phone_number(phone_number):
             messagebox.showinfo("Error", "Invalid Phone Number")
@@ -371,8 +366,10 @@ def registration_page_functioin():
 
     Date_of_birth_label = ctk.CTkLabel(registration_page, text="Date Of Birth (DD/MM/YYYY) *", font=("Helvetica", 12))
     Date_of_birth_label.place(x=48, y=130)
-    Date_of_birth_entry = ctk.CTkEntry(registration_page, width=200)
-    Date_of_birth_entry.place(x=48, y=155)
+    Date_of_birth_entry = DateEntry(registration_page, width=30, background='darkblue',
+                                    foreground='white', borderwidth=2)
+
+    Date_of_birth_entry.place(x=70, y=250)
 
     Phone_number_label = ctk.CTkLabel(registration_page, text="Phone Number (09xxxxxxxxx) *", font=("Helvetica", 12))
     Phone_number_label.place(x=280, y=130)
@@ -423,7 +420,46 @@ def registration_page_functioin():
     register_button.place(x=300, y=530)  
 
 
+# System User Dashboard window
 def system_user_dashboard_function():
+    
+    # Store references to the current page widgets
+    current_page_widgets = []
+
+    # Function to destroy widgets of the current page
+    def destroy_current_page_widgets():
+        for widget in current_page_widgets:
+            widget.destroy()
+        current_page_widgets.clear()
+    
+    
+    # Forward to home page
+    def navigate_to_home_page():
+        destroy_current_page_widgets()
+        app.update()
+        system_user_home_button_function()
+
+
+    # Forward to search page
+    def navigate_to_search_page():
+        destroy_current_page_widgets()
+        app.update()
+        system_user_search_button_function()
+
+
+    # Forward to change password page
+    def navigate_to_delete_account_page():
+        destroy_current_page_widgets()
+        app.update()
+        system_user_delete_account_button_function()
+
+
+    # Forward to logout page
+    def navigate_to_logout_page():
+        destroy_current_page_widgets()
+        app.update()
+        system_user_logout_button_function()
+
 
     # Function of home button in system user dashboard
     def system_user_home_button_function():
@@ -475,7 +511,7 @@ def system_user_dashboard_function():
         # Function to display user accounts for a month
         def display_user_accounts_for_month():
             # Fetch the month from the box's tag
-            month = canvas.gettags(monthly_new_users_box)[0]
+            month = canvas_for_monthly_new_users.gettags(monthly_new_users_rectangle)[0]
 
             # Open the CSV file and read the data
             with open("user_accounts.csv", "r", newline="") as csvfile:
@@ -492,13 +528,13 @@ def system_user_dashboard_function():
                         if row[9]:  # Check if registration date is not an empty string
                             registration_date = datetime.datetime.strptime(row[9], "%Y-%m-%d %H:%M:%S.%f").date()
                             if start_date <= registration_date <= end_date:
-                                filtered_data.append([row[0], row[1], row[2], row[3], row[4], row[5] + row[6]])
+                                filtered_data.append([row[0], row[1], row[2], row[3], row[4], row[5] , row[6]])
             
             
             # Create a new window to display the user accounts
             display_window = ctk.CTkToplevel(home_page)
             display_window.title(f"User Accounts for {month}")
-            display_window.geometry("800x400")
+            display_window.geometry("1300x400")
                         
                     
             # Display the filtered data in the existing frame
@@ -510,7 +546,7 @@ def system_user_dashboard_function():
                     table.heading(col, text=col)
                 for row_data in filtered_data:
                     table.insert("", "end", values=row_data)
-                table.pack(fill="both", expand=False)
+                table.pack(fill="both", expand=True)
             else:
                 messagebox.showinfo("User Accounts", f"No user accounts found for {month}.")
                 
@@ -529,7 +565,7 @@ def system_user_dashboard_function():
             # Create a new window to display the user accounts
             display_window = ctk.CTkToplevel(home_page)
             display_window.title("All User Accounts")
-            display_window.geometry("800x400")
+            display_window.geometry("1300x400")
             display_window.resizable(False, False)
 
             # Display the data in a table format
@@ -543,30 +579,30 @@ def system_user_dashboard_function():
 
         
         # Display the total number of new registered users
-        def draw_rectangle_for_monthly_new_users(canvas):
+        def draw_rectangle_for_monthly_new_users(canvas_for_monthly_new_users):
             total_monthly_new_users = get_total_monthly_new_users()
             # Draw a rectangle
             global monthly_new_users_rectangle
-            monthly_new_users_rectangle = canvas.create_rectangle(0, 0, 230, 60, fill="blue", tags=f"Total number of new registered users: {total_monthly_new_users}")
-            canvas.create_text(110, 30, text=f"Monthly New Users: {total_monthly_new_users}", fill="white", font=("Helvetica", 12))
-            canvas.tag_bind(monthly_new_users_rectangle, "<Button-1>", lambda event: display_user_accounts_for_month())
+            monthly_new_users_rectangle = canvas_for_monthly_new_users.create_rectangle(0, 0, 230, 60, fill="blue", tags=f"Total number of new registered users: {total_monthly_new_users}")
+            canvas_for_monthly_new_users.create_text(110, 30, text=f"Monthly New Users: {total_monthly_new_users}", fill="white", font=("Helvetica", 12))
+            canvas_for_monthly_new_users.tag_bind(monthly_new_users_rectangle, "<Button-1>", lambda event: display_user_accounts_for_month())
 
             
         # Display the total number of all registered users
-        def draw_rectangle_for_total_end_users(canvas):
+        def draw_rectangle_for_total_end_users(canvas_for_total_end_users):
             total_end_users = get_total_end_users()
             # Draw a rectangle
             global total_users_rectangle
-            total_users_rectangle = canvas.create_rectangle(250, 0, 500, 60, fill="blue", tags=f"Total number of registered users: {total_end_users}")
-            canvas.create_text(375, 30, text=f"Total Registered Users: {total_end_users}", fill="white", font=("Helvetica", 12))
-            canvas.tag_bind(total_users_rectangle, "<Button-1>", lambda event: display_all_user_accounts())
+            total_users_rectangle = canvas_for_total_end_users.create_rectangle(0, 0, 250, 60, fill="#3D4633", tags=f"Total number of registered users: {total_end_users}")
+            canvas_for_total_end_users.create_text(125, 30, text=f"Total Registered Users: {total_end_users}", fill="white", font=("Helvetica", 12))
+            canvas_for_total_end_users.tag_bind(total_users_rectangle, "<Button-1>", lambda event: display_all_user_accounts())
 
         welcome_label = ctk.CTkLabel(home_page, text="Welcome Admin!", font=("Helvetica", 35, "bold"))
         welcome_label.place(x=180, y=100)
         
         # Display default profile picture
-        user_profile_pic = ctk.CTkImage(light_image=Image.open("user_profile_pic.jpg"), 
-                                        dark_image=Image.open("user_profile_pic.jpg"), size=(105,105))
+        user_profile_pic = ctk.CTkImage(light_image=Image.open("system_user_profile_pic.jpg"), 
+                                        dark_image=Image.open("system_user_profile_pic.jpg"), size=(105,105))
             
         # Create profile picture frame
         profile_picture_frame = ctk.CTkFrame(home_page, width=105, height=105, border_color="black", border_width=2)
@@ -577,25 +613,72 @@ def system_user_dashboard_function():
         profile_picture_label.pack(fill="both", expand=True)
 
         # Create a Canvas widget
-        canvas = tk.Canvas(home_page, width=500, height=60, background="lightgray")
-        canvas.place(x=100, y=300)
-        draw_rectangle_for_monthly_new_users(canvas)
-        draw_rectangle_for_total_end_users(canvas)
+        canvas_for_monthly_new_users = tk.Canvas(home_page, width=230, height=60, background="lightgray")
+        canvas_for_monthly_new_users.place(x=100, y=300)
+        canvas_for_total_end_users = tk.Canvas(home_page, width=250, height=60, background="lightgray")
+        canvas_for_total_end_users.place(x=450, y=300)
+        draw_rectangle_for_monthly_new_users(canvas_for_monthly_new_users)
+        draw_rectangle_for_total_end_users(canvas_for_total_end_users)
+
 
     # Function of search button in system user dashboard
     def system_user_search_button_function():
         search_page = ctk.CTkFrame(master=system_user_dashboard, width=550, height=600)
         search_page.place(x=150, y=0)
-        
+                
         def search_account():
-            pass
+            # Get the search query from the entry field
+            search_query = search_entry.get()
+
+            # Get the selected search criteria from the combobox
+            search_criteria = search_criteria_combobox.get()
+
+            # Open the CSV file and read the data
+            with open("user_accounts.csv", "r", newline="") as csvfile:
+                reader = csv.reader(csvfile)
+                next(reader)  # Skip the header row
+
+                # Filter the data based on the search criteria and query
+                filtered_data = []
+                for row in reader:
+                    # Check if the search query matches the data in the selected criteria
+                    if search_criteria == "First Name" and row[1].lower() == search_query.lower():
+                        filtered_data.append(row)
+                    elif search_criteria == "Last Name" and row[2].lower() == search_query.lower():
+                        filtered_data.append(row)
+                    elif search_criteria == "User ID" and row[0].lower() == search_query.lower():
+                        filtered_data.append(row)
+                    elif search_criteria == "Email" and row[6].lower() == search_query.lower():
+                        filtered_data.append(row)
+
+            # Display the filtered data
+            if filtered_data:
+                display_search_results(filtered_data)
+            else:
+                messagebox.showinfo("Search Results", "No matching accounts found.")
+
+        def display_search_results(data):
+            # Create a new window to display the search results
+            search_results_window = ctk.CTkToplevel(search_page)
+            search_results_window.title("Search Results")
+            search_results_window.geometry("1300x400")
+            search_results_window.resizable(False, False)
+
+            # Display the data in a table format
+            columns = ["User ID", "First Name", "Last Name", "Date of Birth", "Phone Number", "Address", "Email"]
+            table = ttk.Treeview(search_results_window, columns=columns, show="headings")
+            for col in columns:
+                table.heading(col, text=col)
+            for row_data in data:
+                table.insert("", "end", values=row_data)
+            table.pack(fill="both", expand=False)
 
         search_entry = ctk.CTkEntry(search_page, width=300)
         search_entry.place(x=48, y=90)
         
         # Search Criteria Combobox
-        search_criteria_label = ctk.CTkLabel(search_page, text="Search Criteria:")
-        search_criteria_label.place(x=350, y=90)
+        search_criteria_label = ctk.CTkLabel(search_page, text="Find by:", font=("Helvetica", 14))
+        search_criteria_label.place(x=350, y=60)
         search_criteria_combobox = ctk.CTkComboBox(search_page, values=["First Name", "Last Name", "User ID", "Email"])
         search_criteria_combobox.set("First Name")
         search_criteria_combobox.set("Last Name")
@@ -606,11 +689,66 @@ def system_user_dashboard_function():
         search_button = ctk.CTkButton(search_page, text="Search", command=search_account, font=("Helvetica", 12))
         search_button.place(x=150, y=120)
 
-
     # Function of delete account button in system user dashboard
     def system_user_delete_account_button_function():
         delete_page = ctk.CTkFrame(master=system_user_dashboard, width=550, height=600)
         delete_page.place(x=150, y=0)
+        
+        search_user_ID_label = ctk.CTkLabel(delete_page, text="Find by: User ID", font=("Helvetica", 15))
+        search_user_ID_label.place(x=100, y=60)
+               
+        search_user_ID_entry = ctk.CTkEntry(delete_page, width=300)
+        search_user_ID_entry.place(x=100, y=100)
+
+        search_button = ctk.CTkButton(delete_page, text="Search", 
+                                      command=lambda: delete_account(search_user_ID_entry.get()), 
+                                      font=("Helvetica", 12))
+        search_button.place(x=175, y=140)
+
+
+    def delete_account(user_id):
+        # Read the user's information from the CSV file
+        with open("user_accounts.csv", "r") as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row[0] == user_id:
+                    # Display user information in a dialog box
+                    info_message = f"User ID: {row[0]}\n" \
+                                f"First Name: {row[1]}\n" \
+                                f"Last Name: {row[2]}\n" \
+                                f"Date of Birth: {row[3]}\n" \
+                                f"Phone Number: {row[4]}\n" \
+                                f"Address: {row[5]}\n" \
+                                f"Email: {row[6]}"
+                    confirmation = messagebox.askyesno("Confirmation", f"Do you want to delete this account?\n\n{info_message}")
+                    if confirmation:
+                        # Read the existing data from the CSV file
+                        with open("user_accounts.csv", "r") as csvfile:
+                            reader = csv.reader(csvfile)
+                            data = list(reader)
+
+                        # Find the index of the row to delete
+                        index_to_delete = None
+                        for i, row in enumerate(data):
+                            if row[0] == user_id:  # Assuming user ID is in the first column
+                                index_to_delete = i
+                                break
+
+                        if index_to_delete is not None:
+                            # Remove the row from the data list
+                            del data[index_to_delete]
+
+                            # Write the updated data back to the CSV file
+                            with open("user_accounts.csv", "w", newline="") as csvfile:
+                                writer = csv.writer(csvfile)
+                                writer.writerows(data)
+
+                            messagebox.showinfo("Success", f"Account with User ID {user_id} has been deleted.")
+                        else:
+                            messagebox.showerror("Error", f"Account with User ID {user_id} not found.")
+                    break
+            else:
+                messagebox.showerror("Error", f"Account with User ID {user_id} not found.")
 
 
     # Function of logout button in system user dashboard
@@ -624,7 +762,7 @@ def system_user_dashboard_function():
             app.update()
             Login_page_function()
         else:
-            system_user_dashboard_function(user_email)
+            system_user_dashboard_function()
 
 
 
@@ -639,31 +777,31 @@ def system_user_dashboard_function():
 
     # Create funtion button for end user menu
     system_user_home_button = ctk.CTkButton(system_user_menu, text="Home", 
-                                            command=system_user_home_button_function,
+                                            command=navigate_to_home_page,
                                             font=("Helvetica", 12, "bold"))
     system_user_home_button.place(x=5, y=200)
 
     system_user_search_button = ctk.CTkButton(system_user_menu, text="Search", 
-                                              command=system_user_search_button_function,
+                                              command=navigate_to_search_page,
                                               font=("Helvetica", 12, "bold"))
     system_user_search_button.place(x=5, y=250)
 
 
     system_user_delete_account_button = ctk.CTkButton(system_user_menu, text="Delete Account", 
-                                                      command=system_user_delete_account_button_function, 
+                                                      command=navigate_to_delete_account_page, 
                                                       font=("Helvetica", 12, "bold"))
     system_user_delete_account_button.place(x=5, y=300)
 
 
     system_user_logout_button = ctk.CTkButton(system_user_menu, text="Log Out", 
-                                              command=system_user_logout_button_function,
+                                              command=navigate_to_logout_page,
                                               font=("Helvetica", 12, "bold"))
     system_user_logout_button.place(x=5, y=450)
     
     system_user_home_button_function()
 
 
-# https://www.youtube.com/watch?v=kxo50SdrZMQ&t=35s to link with file and each user 
+# End User Dashboard window
 def end_user_dashboard_function(user_email):
     # Store references to the current page widgets
     current_page_widgets = []
@@ -681,17 +819,20 @@ def end_user_dashboard_function(user_email):
         app.update()
         end_user_home_button_function(user_email)
 
+
     # Forward to edit profile page
     def navigate_to_edit_profile_page(user_email):
         destroy_current_page_widgets()
         app.update()
         end_user_edit_button_function(user_email)
 
+
     # Forward to change password page
     def navigate_to_change_password_page(user_email):
         destroy_current_page_widgets()
         app.update()
         end_user_change_password_button_function(user_email)
+
 
     # Forward to logout page
     def navigate_to_logout_page(user_email):
@@ -720,6 +861,7 @@ def end_user_dashboard_function(user_email):
                     return user_info
 
         return None
+
 
     # Function to get the path of the user's profile picture
     def get_profile_picture_path(user_id):
@@ -787,8 +929,6 @@ def end_user_dashboard_function(user_email):
         profile_picture_label.pack(fill="both", expand=True)
         
 
-        
-
     # Function of edit button in end user dashboard
     def end_user_edit_button_function(user_email):
         # create edit profile page frame
@@ -802,7 +942,7 @@ def end_user_dashboard_function(user_email):
         user_info = get_user_information(user_email)
         profile_picture_path = get_profile_picture_path(user_info['User ID'])
         
-        def done_button_function():
+        def change_button_function():
             first_name = First_name_entry.get()
             last_name = Last_name_entry.get()
             date_of_birth = Date_of_birth_entry.get()
@@ -958,12 +1098,11 @@ def end_user_dashboard_function(user_email):
         Email_entry.place(x=40, y=415)
 
         # Create function button for end user menu
-        done_button = ctk.CTkButton(edit_profile_page, text="Done", command=done_button_function,
+        change_button = ctk.CTkButton(edit_profile_page, text="Done", command=change_button_function,
                                     font=("Helvetica", 12, "bold"))
-        done_button.place(x=40, y=500)
+        change_button.place(x=40, y=500)
 
         
-
     # Function of change password button in end user dashboard
     def end_user_change_password_button_function(user_email):
 
@@ -974,8 +1113,44 @@ def end_user_dashboard_function(user_email):
             else:
                 password.configure(show="*")
 
-        def confirm_button(): #####3
-            pass
+        # Function to validate and amend password
+        def confirm_button(): 
+            # Get the values from entry boxes
+            current_password = current_password_entry.get()
+            new_password = new_password_entry.get()
+            confirm_new_password = confirm_new_password_entry.get()
+
+            # Read the CSV file and find the user's entry
+            with open("user_accounts.csv", "r") as csvfile:
+                reader = csv.reader(csvfile)
+                rows = list(reader)
+
+            user_index = None
+            for i, row in enumerate(rows):
+                if row[6] == user_email:  # Assuming email is at index 6
+                    user_index = i
+                    break
+
+            if user_index is not None:
+                stored_password = rows[user_index][7]  # Assuming password is at index 7
+                
+                # Check if the current password matches the stored password
+                if current_password != stored_password:
+                    messagebox.showinfo("Error", "Current password is incorrect.")
+                elif new_password != confirm_new_password:
+                    messagebox.showinfo("Error", "New password and confirm password do not match.")
+                else:
+                    # Update the password in the list of rows
+                    rows[user_index][7] = new_password
+
+                    # Write the updated rows back to the CSV file
+                    with open("user_accounts.csv", "w", newline="") as csvfile:
+                        writer = csv.writer(csvfile)
+                        writer.writerows(rows)
+
+                    messagebox.showinfo("Success", "Password updated successfully.")
+            else:
+                messagebox.showinfo("Error", "User not found.")
 
 
         # creating change password page
@@ -1027,7 +1202,6 @@ def end_user_dashboard_function(user_email):
         confirm_button.place(x=150, y=450)   
 
         
-
     # Function of logout button in end user dashboard
     def end_user_logout_button_function(user_email):
         logout_page = ctk.CTkFrame(master=end_user_dashboard, width=550, height=600)
@@ -1040,7 +1214,6 @@ def end_user_dashboard_function(user_email):
             Login_page_function()
         else:
             end_user_dashboard_function(user_email)
-
 
     
     # main frame of end user dashboard 
@@ -1077,129 +1250,5 @@ def end_user_dashboard_function(user_email):
 
     end_user_edit_button_function(user_email)
 
-
-
-Login_page_function()
+registration_page_function()
 app.mainloop()
-"""
-# Function to display found user accounts
-def display_found_accounts(accounts):
-    message = "Found Accounts:\n\n"
-    for account in accounts:
-        formatted_account = (
-            f"First Name: {account[0]} \n"
-            f"Last Name: {account[1]}, \n"
-            f"Date of Birth: {account[2]}, \n"
-            f"Phone Number: {account[3]}, \n"
-            f"Address: {account[4]}, \n"
-            f"Password: {account[5]}"
-        )
-        message += f"{formatted_account}\n"
-    messagebox.showinfo("Search Results", message)
-
-
-# Function to display all user accounts
-def display_user_accounts():
-    with open("user_accounts.csv", "r", newline="") as csvfile:
-        reader = csv.reader(csvfile)
-        data = list(reader)
-
-    if len(data) > 0:
-        # create a new window to display the user account
-        display_window = ctk.CTkToplevel(frame_2)
-        display_window.title("User Accounts")
-        display_window.geometry("800x400")
-        display_window.resizable(False, False)
-
-        header_data = data[0]
-        for col_num, header in enumerate(header_data):
-            header_label = ctk.CTkLabel(master=display_window, text=header, font=("Helvetica", 12, "bold"))
-            header_label.grid(row=0, column=col_num, padx=5, pady=5)
-
-        # Data Rows
-        for row_num in range(1, len(data)):
-            row_data = data[row_num]
-            for col_num in range(len(row_data)):
-                col_value = row_data[col_num]
-                data_label = ctk.CTkLabel(master=display_window, text=col_value, font=("Helvetica", 10))
-                data_label.grid(row=row_num, column=col_num, padx=5, pady=5)
-    else:
-        messagebox.showinfo("User Accounts", "No user accounts found.")
-
-
-# Function to search user accounts
-def search_function():
-    search_term = search_entry.get()
-    # Validate the present of entry
-    if not is_present(search_term):
-        messagebox.showerror("Error", "Please enter a search term")
-        return
-
-    with open("user_accounts.csv", "r", newline="") as csvfile:
-        reader = csv.reader(csvfile)
-        data = list(reader)
-
-    found_accounts = [row for row in data[1:] if any(search_term.lower() in col.lower() for col in row)]
-
-    # check if the account is in the data list
-    if not found_accounts:
-        messagebox.showinfo("Info", "No matching accounts found")
-    else:
-        display_found_accounts(found_accounts)
-
-
-# Search Window
-def search_window():
-    # create a new window for the search
-    search_window = ctk.CTkToplevel(system_user_profile_window)
-    search_window.title("Search User Accounts")
-    search_window.geometry("400x200")
-
-    search_label = ctk.CTkLabel(search_window, text="Enter search term:", font=("Helvetica", 10))
-    search_label.pack(pady=10)
-
-    # Set the scope of varible globally
-    global search_entry
-    search_entry = ctk.CTkEntry(search_window, width=200, font=("Helvetica", 10))
-    search_entry.pack(pady=5)
-
-    # create search button
-    search_button = ctk.CTkButton(search_window, text="Search", command=search_function, font=("Helvetica", 10))
-    search_button.pack(pady=5)
-
-
-
-    
-# create another frame on the right
-frame_2 = ctk.CTkFrame(master=app, width=530, height=530, corner_radius=15)
-frame_2.place(relx=0.76, rely=0.5, anchor=tk.CENTER)
-
-frame_3 = ctk.CTkFrame(master=app, width=530, height=430, corner_radius=15)
-frame_3.place(relx=0.66, rely=0.5, anchor=tk.CENTER)
-
-# create search user account button
-search_user_account_button = ctk.CTkButton(master=frame_3, text="Search User Account", command=search_window, font=("Helvetica", 12, "bold"))
-search_user_account_button.place(x=25, y=125)
-
-# create display user accounts button
-display_user_accounts_button = ctk.CTkButton(master=frame_3, text="Display User Accounts", command=display_user_accounts, font=("Helvetica", 12, "bold"))
-display_user_accounts_button.place(x=25, y=195)
-
-# create update user accounts button
-Update_Account_button = ctk.CTkButton(master=frame_3, text="Update User Accounts", command=update_user_accounts, font=("Helvetica", 12, "bold"))
-Update_Account_button.place(x=25, y=125)
-"""
-
-"""      
-    def generate_captcha_text():      
-        captcha_characters = string.ascii_letters + string.digits
-        captcha_challenge = ''.join(random.choice(captcha_characters) for _ in range(6))
-        return captcha_challenge
-
-    def generate_captcha():
-        global img
-        captcha_obj = ImageCaptcha(height=150, width=250)
-        captcha_obj.write(chars=generate_captcha_text(), putput= "_captcha.png")
-        img =  PhotoImage(_file="_captcha.png")
-        captcha_image.configure(image=img)
-"""
