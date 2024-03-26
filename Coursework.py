@@ -30,7 +30,7 @@ app.resizable(False, False)
 app.title("User Account Registration System")
 
 # Set the background color
-app.configure(bg="lightgray")
+app.configure(bg="light grey")
 
 # Store system user's email & password in csv file
 # Check if the CSV file exists
@@ -49,13 +49,16 @@ def is_present(value):
     return value is not None and value != ""
 
 
-# Function to check the format of Date of Birth Entry
-def is_valid_date_of_birth(date_of_birth):
-    # Define the regular expression pattern for DD/MM/YYYY
-    date_pattern = re.compile(r'^\d{2}/\d{2}/\d{4}$')
-
-    # Check if the date_of_birth matches the pattern
-    return bool(date_pattern.match(date_of_birth))
+# Function to check if the date of birth is today's date
+def is_today_date_of_birth(date_of_birth):
+    # Get today's date
+    today = datetime.date.today()
+    
+    # Convert the date_of_birth string to a datetime object
+    date_of_birth = datetime.datetime.strptime(date_of_birth, "%m/%d/%y").date()
+    
+    # Check if the date of birth is the same as today's date
+    return date_of_birth == today
 
 
 # Function to check the length of (11 digits) and starts with '09'
@@ -87,7 +90,7 @@ def Login_page_function():
     def forward_to_registration_page():
         Login_page.destroy()
         app.update()
-        registration_page_functioin()
+        registration_page_function()
 
 
     # Function to direct to System User's Dashboard
@@ -138,28 +141,28 @@ def Login_page_function():
             messagebox.showerror("Error", "Invalid email or password")
 
     # Create Login Page
-    Login_page = ctk.CTkFrame(master=app, width=300, height=400, corner_radius=15)
+    Login_page = ctk.CTkFrame(master=app, width=300, height=400, corner_radius=15, fg_color="#DDDDDD")
     Login_page.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     # Create labels and entry widgets for login page
-    Login_label_1 = ctk.CTkLabel(master=Login_page, text="Login", font=("Helvetica", 20, "bold"))
-    Login_label_1.place(x=35, y=40)
+    Login_label_1 = ctk.CTkLabel(master=Login_page, text="Login", font=(font_style, 30, "bold"))
+    Login_label_1.place(x=30, y=40)
 
-    Email_entry = ctk.CTkEntry(master=Login_page, width=260, placeholder_text="Email", font=("Helvetica", 10))
+    Email_entry = ctk.CTkEntry(master=Login_page, width=260, placeholder_text="Email", font=(font_style, 11))
     Email_entry.place(x=20, y=110)
 
-    Password_entry = ctk.CTkEntry(master=Login_page, width=260, placeholder_text="Password", show="*", font=("Helvetica", 10))
+    Password_entry = ctk.CTkEntry(master=Login_page, width=260, placeholder_text="Password", show="*", font=(font_style, 11))
     Password_entry.place(x=20, y=160)
-    Password_shown_check = ctk.CTkCheckBox(master=Login_page, text="Show Password", command=show_hide_password, font=("Helvetica", 10))
+    Password_shown_check = ctk.CTkCheckBox(master=Login_page, text="Show Password", command=show_hide_password, font=(font_style, 11))
     Password_shown_check.place(x=20, y=200)
     Password_shown_check.configure(checkbox_width=15, checkbox_height=15, border_width=3)
     # Create login button
     login_button = ctk.CTkButton(master=Login_page, text="Sign In", command=login_button_function, width=260,
-                                font=("Helvetica", 12, "bold"))
+                                font=(font_style, 12))
     login_button.place(x=20, y=250)
 
     # Create a link to register page
-    register_label = ctk.CTkLabel(master=Login_page, text="Doesn't have an account? Register", font=("Helvetica", 10), cursor="hand2")
+    register_label = ctk.CTkLabel(master=Login_page, text="Doesn't have an account? Register", font=(font_style, 10), cursor="hand2")
     register_label.place(x=70, y=280)
 
     # Bind the label to the registration window function
@@ -284,13 +287,16 @@ def registration_page_function():
 
         elif not is_valid_phone_number(phone_number):
             messagebox.showinfo("Error", "Invalid Phone Number")
-
+            
+        elif is_today_date_of_birth(date_of_birth):
+            messagebox.showinfo("Error", "Date of birth cannot be today's date")
+            
         elif not is_valid_email(email):
             messagebox.showinfo("Error", "Invalid Email")
-
+            
         elif not is_valid_password(password):
             messagebox.showinfo("Error", "Invalid Password")
-
+        
         else:
             # Generate a unique user ID
             user_id = generate_user_id()
@@ -343,72 +349,73 @@ def registration_page_function():
     registration_page.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     # Create backward button
-    backward_button = ctk.CTkButton(registration_page, text="←", font=("Helvetica", 10, "bold"), 
+    backward_button = ctk.CTkButton(registration_page, text="←", font=(font_style, 10, "bold"), 
                                 text_color= "black", fg_color="lightgray", hover_color="lightgray", width=3, command=forward_to_login_page)
     backward_button.place(x=10, y=35)
 
     # Create labels and entry widgets for registration
-    Register_label_1 = ctk.CTkLabel(registration_page, text="REGISTER HERE", font=("Helvetica", 20, "bold"))
+    Register_label_1 = ctk.CTkLabel(registration_page, text="REGISTER HERE", font=(font_style, 20, "bold"))
     Register_label_1.place(x=45, y=35)
 
     # Set the scope of Varibles globally
     global First_name_entry, Last_name_entry, Date_of_birth_entry, Phone_number_entry, Address_entry1, Address_entry2, Email_entry, Password_entry
 
-    First_name_label = ctk.CTkLabel(registration_page, text="First Name *", font=("Helvetica", 12))
+    First_name_label = ctk.CTkLabel(registration_page, text="First Name *", font=(font_style, 12))
     First_name_label.place(x=48, y=70)
     First_name_entry = ctk.CTkEntry(registration_page, width=200)
     First_name_entry.place(x=48, y=95)
 
-    Last_name_label = ctk.CTkLabel(registration_page, text="Last Name *", font=("Helvetica", 12))
+    Last_name_label = ctk.CTkLabel(registration_page, text="Last Name *", font=(font_style, 12))
     Last_name_label.place(x=280, y=70)
     Last_name_entry = ctk.CTkEntry(registration_page, width=200)
     Last_name_entry.place(x=280, y=95)
 
-    Date_of_birth_label = ctk.CTkLabel(registration_page, text="Date Of Birth (DD/MM/YYYY) *", font=("Helvetica", 12))
+    Date_of_birth_label = ctk.CTkLabel(registration_page, text="Date Of Birth (DD/MM/YYYY) *", font=(font_style, 12))
     Date_of_birth_label.place(x=48, y=130)
     Date_of_birth_entry = DateEntry(registration_page, width=30, background='darkblue',
                                     foreground='white', borderwidth=2)
 
     Date_of_birth_entry.place(x=70, y=250)
 
-    Phone_number_label = ctk.CTkLabel(registration_page, text="Phone Number (09xxxxxxxxx) *", font=("Helvetica", 12))
+    Phone_number_label = ctk.CTkLabel(registration_page, text="Phone Number (09xxxxxxxxx) *", font=(font_style, 12))
     Phone_number_label.place(x=280, y=130)
     Phone_number_entry = ctk.CTkEntry(registration_page, width=200)
     Phone_number_entry.place(x=280, y=155)
 
-    Address_label1 = ctk.CTkLabel(registration_page, text="Address 1 *", font=("Helvetica", 12))
+    Address_label1 = ctk.CTkLabel(registration_page, text="Address 1 *", font=(font_style, 12))
     Address_label1.place(x=48, y=190)
     Address_entry1 = ctk.CTkEntry(registration_page, width=300)
     Address_entry1.place(x=48, y=215)
 
-    Address_label2 = ctk.CTkLabel(registration_page, text="Address 2 *", font=("Helvetica", 12))
+    Address_label2 = ctk.CTkLabel(registration_page, text="Address 2 *", font=(font_style, 12))
     Address_label2.place(x=48, y=250)
     Address_entry2 = ctk.CTkEntry(registration_page, width=300)
     Address_entry2.place(x=48, y=275)
 
-    Email_label = ctk.CTkLabel(registration_page, text="Email *", font=("Helvetica", 12))
+    Email_label = ctk.CTkLabel(registration_page, text="Email *", font=(font_style, 12))
     Email_label.place(x=48, y=310)
     Email_entry = ctk.CTkEntry(registration_page, width=300)
     Email_entry.place(x=48, y=335)
     
-    Password_label = ctk.CTkLabel(registration_page, text="Password (Min 8 chars, letter, digit, special char) *", font=("Helvetica", 12))
+    Password_label = ctk.CTkLabel(registration_page, text="Password (Min 8 chars, letter, digit, special char) *", font=(font_style, 12))
     Password_label.place(x=48, y=370)
     Password_entry = ctk.CTkEntry(registration_page, width=300)
     Password_entry.place(x=48, y=395)
     
    
     # Create a label and entry to enter the CAPTCHA 
-    captcha_text_label = ctk.CTkLabel(registration_page, text='Enter CAPTCHA *', font=("Helvetica", 12))
+    captcha_text_label = ctk.CTkLabel(registration_page, text='Enter CAPTCHA *', font=(font_style, 12))
     captcha_text_label.place(x=48, y=430)
+    
     captcha_entry = ctk.CTkEntry(registration_page, width=150)
     captcha_entry.place(x=48, y=455)
+    
+    # Bind the <FocusIn> event to the captcha_entry widget
+    captcha_entry.bind("<FocusIn>", lambda event: update_captcha_image())
+    
     captcha_entry_button = ctk.CTkButton(registration_page, text="Submit", command=validate_captcha)
-    captcha_entry_button.place(x=48, y=530)
-
-
-    # Button to generate CAPTCHA
-    Captcha_button = ctk.CTkButton(registration_page, text="Generate CAPTCHA", command=update_captcha_image)
-    Captcha_button.place(x=48, y=490)
+    captcha_entry_button.place(x=48, y=490)
+    
     
     # Label to display the CAPTCHA image
     captcha_label = ctk.CTkLabel(registration_page)  
@@ -416,8 +423,8 @@ def registration_page_function():
 
     # create register button
     register_button = ctk.CTkButton(registration_page, text="Register", command=register_button_function,
-                                    font=("Helvetica", 12, "bold"), state="disabled")
-    register_button.place(x=300, y=530)  
+                                    font=(font_style, 12, "bold"), state="disabled")
+    register_button.place(x=48, y=530)  
 
 
 # System User Dashboard window
@@ -597,7 +604,7 @@ def system_user_dashboard_function():
             canvas_for_total_end_users.create_text(125, 30, text=f"Total Registered Users: {total_end_users}", fill="white", font=("Helvetica", 12))
             canvas_for_total_end_users.tag_bind(total_users_rectangle, "<Button-1>", lambda event: display_all_user_accounts())
 
-        welcome_label = ctk.CTkLabel(home_page, text="Welcome Admin!", font=("Helvetica", 35, "bold"))
+        welcome_label = ctk.CTkLabel(home_page, text="Welcome Admin!", font=(font_style, 35, "bold"))
         welcome_label.place(x=180, y=100)
         
         # Display default profile picture
@@ -609,7 +616,7 @@ def system_user_dashboard_function():
         profile_picture_frame.place(x=30, y=50)
 
         # Create a label to display the profile picture
-        profile_picture_label = ctk.CTkLabel(profile_picture_frame, image=user_profile_pic)
+        profile_picture_label = ctk.CTkLabel(profile_picture_frame, image=user_profile_pic, text="")
         profile_picture_label.pack(fill="both", expand=True)
 
         # Create a Canvas widget
@@ -620,6 +627,14 @@ def system_user_dashboard_function():
         draw_rectangle_for_monthly_new_users(canvas_for_monthly_new_users)
         draw_rectangle_for_total_end_users(canvas_for_total_end_users)
 
+        # load picture    
+        sys_pic_1 = ctk.CTkImage(light_image=Image.open("sys_pic_1.jpg"), 
+                            dark_image=Image.open("sys_pic_1.jpg"), size=(300, 200))
+        
+        # Create a label to display the picture
+        profile_picture_label = ctk.CTkLabel(home_page, image=sys_pic_1, text="")
+        profile_picture_label.image = sys_pic_1
+        profile_picture_label.place(x=80, y=300)
 
     # Function of search button in system user dashboard
     def system_user_search_button_function():
@@ -677,7 +692,7 @@ def system_user_dashboard_function():
         search_entry.place(x=48, y=90)
         
         # Search Criteria Combobox
-        search_criteria_label = ctk.CTkLabel(search_page, text="Find by:", font=("Helvetica", 14))
+        search_criteria_label = ctk.CTkLabel(search_page, text="Find by:", font=(font_style, 14))
         search_criteria_label.place(x=350, y=60)
         search_criteria_combobox = ctk.CTkComboBox(search_page, values=["First Name", "Last Name", "User ID", "Email"])
         search_criteria_combobox.set("First Name")
@@ -686,7 +701,7 @@ def system_user_dashboard_function():
         search_criteria_combobox.set("Email")
         search_criteria_combobox.place(x=350, y=90)
 
-        search_button = ctk.CTkButton(search_page, text="Search", command=search_account, font=("Helvetica", 12))
+        search_button = ctk.CTkButton(search_page, text="Search", command=search_account, font=(font_style, 12))
         search_button.place(x=150, y=120)
 
     # Function of delete account button in system user dashboard
@@ -694,7 +709,7 @@ def system_user_dashboard_function():
         delete_page = ctk.CTkFrame(master=system_user_dashboard, width=550, height=600)
         delete_page.place(x=150, y=0)
         
-        search_user_ID_label = ctk.CTkLabel(delete_page, text="Find by: User ID", font=("Helvetica", 15))
+        search_user_ID_label = ctk.CTkLabel(delete_page, text="Find by: User ID", font=(font_style, 15))
         search_user_ID_label.place(x=100, y=60)
                
         search_user_ID_entry = ctk.CTkEntry(delete_page, width=300)
@@ -702,7 +717,7 @@ def system_user_dashboard_function():
 
         search_button = ctk.CTkButton(delete_page, text="Search", 
                                       command=lambda: delete_account(search_user_ID_entry.get()), 
-                                      font=("Helvetica", 12))
+                                      font=(font_style, 12))
         search_button.place(x=175, y=140)
 
 
@@ -765,8 +780,6 @@ def system_user_dashboard_function():
             system_user_dashboard_function()
 
 
-
-
     # main frame of end user dashboard 
     system_user_dashboard = ctk.CTkFrame(master=app, width=700, height=600, border_color="black", border_width=1.5)
     system_user_dashboard.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
@@ -778,25 +791,25 @@ def system_user_dashboard_function():
     # Create funtion button for end user menu
     system_user_home_button = ctk.CTkButton(system_user_menu, text="Home", 
                                             command=navigate_to_home_page,
-                                            font=("Helvetica", 12, "bold"))
-    system_user_home_button.place(x=5, y=200)
+                                            font=(font_style, 12))
+    system_user_home_button.place(x=5, y=150)
 
     system_user_search_button = ctk.CTkButton(system_user_menu, text="Search", 
                                               command=navigate_to_search_page,
-                                              font=("Helvetica", 12, "bold"))
-    system_user_search_button.place(x=5, y=250)
+                                              font=(font_style, 12))
+    system_user_search_button.place(x=5, y=190)
 
 
     system_user_delete_account_button = ctk.CTkButton(system_user_menu, text="Delete Account", 
                                                       command=navigate_to_delete_account_page, 
-                                                      font=("Helvetica", 12, "bold"))
-    system_user_delete_account_button.place(x=5, y=300)
+                                                      font=(font_style, 12))
+    system_user_delete_account_button.place(x=5, y=230)
 
 
     system_user_logout_button = ctk.CTkButton(system_user_menu, text="Log Out", 
                                               command=navigate_to_logout_page,
-                                              font=("Helvetica", 12, "bold"))
-    system_user_logout_button.place(x=5, y=450)
+                                              font=(font_style, 12))
+    system_user_logout_button.place(x=5, y=500)
     
     system_user_home_button_function()
 
@@ -886,28 +899,28 @@ def end_user_dashboard_function(user_email):
         # display all the information of user 
         if user_info: 
             # welcome statement
-            welcome_label = ctk.CTkLabel(home_page, text=f"Welcome {user_info['Last Name']}!", font=("Helvetica", 35, "bold"))
+            welcome_label = ctk.CTkLabel(home_page, text=f"Welcome {user_info['Last Name']}!", font=(font_style, 35, "bold"))
             welcome_label.place(x=180, y=100)
 
-            user_ID_label = ctk.CTkLabel(home_page, text=f"User ID: {user_info['User ID']}", font=("Helvetica", 20))
+            user_ID_label = ctk.CTkLabel(home_page, text=f"User ID: {user_info['User ID']}", font=(font_style, 20))
             user_ID_label.place(x=30, y=200)
 
-            first_name_label = ctk.CTkLabel(home_page, text=f"First Name: {user_info['First Name']}", font=("Helvetica", 20))
+            first_name_label = ctk.CTkLabel(home_page, text=f"First Name: {user_info['First Name']}", font=(font_style, 20))
             first_name_label.place(x=30, y=250)
 
-            last_name_label = ctk.CTkLabel(home_page, text=f"Last Name: {user_info['Last Name']}", font=("Helvetica", 20))
+            last_name_label = ctk.CTkLabel(home_page, text=f"Last Name: {user_info['Last Name']}", font=(font_style, 20))
             last_name_label.place(x=30, y=300)
 
-            dob_label = ctk.CTkLabel(home_page, text=f"Date of Birth: {user_info['Date of Birth']}", font=("Helvetica", 20))
+            dob_label = ctk.CTkLabel(home_page, text=f"Date of Birth: {user_info['Date of Birth']}", font=(font_style, 20))
             dob_label.place(x=30, y=350)
 
-            address_label = ctk.CTkLabel(home_page, text=f"Address: {user_info['Address']}", font=("Helvetica", 20))
+            address_label = ctk.CTkLabel(home_page, text=f"Address: {user_info['Address']}", font=(font_style, 20))
             address_label.place(x=30, y=400)
 
-            phone_number_label = ctk.CTkLabel(home_page, text=f"Phone Number: {user_info['Phone Number']}", font=("Helvetica", 20))
+            phone_number_label = ctk.CTkLabel(home_page, text=f"Phone Number: {user_info['Phone Number']}", font=(font_style, 20))
             phone_number_label.place(x=30, y=450)
 
-            email_label = ctk.CTkLabel(home_page, text=f"Email: {user_info['Email']}", font=("Helvetica", 20))
+            email_label = ctk.CTkLabel(home_page, text=f"Email: {user_info['Email']}", font=(font_style, 20))
             email_label.place(x=30, y=500)
         
             
@@ -925,7 +938,7 @@ def end_user_dashboard_function(user_email):
         profile_picture_frame.place(x=30, y=50)
 
         # Create a label to display the profile picture
-        profile_picture_label = ctk.CTkLabel(profile_picture_frame, image=user_profile_pic)
+        profile_picture_label = ctk.CTkLabel(profile_picture_frame, image=user_profile_pic, text="")
         profile_picture_label.pack(fill="both", expand=True)
         
 
@@ -1002,7 +1015,6 @@ def end_user_dashboard_function(user_email):
                         password.set("")
 
 
-
         def handle_picture_upload(user_id):
             # Open file dialog to select picture
             file_path = filedialog.askopenfilename()
@@ -1057,49 +1069,48 @@ def end_user_dashboard_function(user_email):
         profile_picture_button.pack()
 
 
-
         # Create labels and entry boxes
-        user_ID_label = ctk.CTkLabel(edit_profile_page, text=f"User ID: {user_info['User ID']}", font=("Helvetica", 20))
+        user_ID_label = ctk.CTkLabel(edit_profile_page, text=f"User ID: {user_info['User ID']}", font=("Aptos SemiBold", 23))
         user_ID_label.place(x=200, y=70)
 
-        First_name_label = ctk.CTkLabel(edit_profile_page, text="First Name *", font=("Helvetica", 16))
+        First_name_label = ctk.CTkLabel(edit_profile_page, text="First Name *", font=(font_style, 16))
         First_name_label.place(x=40, y=150)
         First_name_entry = ctk.CTkEntry(edit_profile_page, width=230)
         First_name_entry.place(x=40, y=175)
 
-        Last_name_label = ctk.CTkLabel(edit_profile_page, text="Last Name *", font=("Helvetica", 16))
+        Last_name_label = ctk.CTkLabel(edit_profile_page, text="Last Name *", font=(font_style, 16))
         Last_name_label.place(x=280, y=150)
         Last_name_entry = ctk.CTkEntry(edit_profile_page, width=230)
         Last_name_entry.place(x=280, y=175)
 
-        Date_of_birth_label = ctk.CTkLabel(edit_profile_page, text="Date Of Birth (DD/MM/YYYY) *", font=("Helvetica", 16))
+        Date_of_birth_label = ctk.CTkLabel(edit_profile_page, text="Date Of Birth (DD/MM/YYYY) *", font=(font_style, 16))
         Date_of_birth_label.place(x=40, y=210)
         Date_of_birth_entry = ctk.CTkEntry(edit_profile_page, width=230)
         Date_of_birth_entry.place(x=40, y=235)
 
-        Phone_number_label = ctk.CTkLabel(edit_profile_page, text="Phone Number (09xxxxxxxxx) *", font=("Helvetica", 16))
+        Phone_number_label = ctk.CTkLabel(edit_profile_page, text="Phone Number (09xxxxxxxxx) *", font=(font_style, 16))
         Phone_number_label.place(x=280, y=210)
         Phone_number_entry = ctk.CTkEntry(edit_profile_page, width=230)
         Phone_number_entry.place(x=280, y=235)
 
-        Address_label1 = ctk.CTkLabel(edit_profile_page, text="Address 1 *", font=("Helvetica", 16))
+        Address_label1 = ctk.CTkLabel(edit_profile_page, text="Address 1 *", font=(font_style, 16))
         Address_label1.place(x=40, y=270)
         Address_entry1 = ctk.CTkEntry(edit_profile_page, width=330)
         Address_entry1.place(x=40, y=295)
 
-        Address_label2 = ctk.CTkLabel(edit_profile_page, text="Address 2 *", font=("Helvetica", 16))
+        Address_label2 = ctk.CTkLabel(edit_profile_page, text="Address 2 *", font=(font_style, 16))
         Address_label2.place(x=40, y=330)
         Address_entry2 = ctk.CTkEntry(edit_profile_page, width=330)
         Address_entry2.place(x=40, y=355)
 
-        Email_label = ctk.CTkLabel(edit_profile_page, text="Email *", font=("Helvetica", 16))
+        Email_label = ctk.CTkLabel(edit_profile_page, text="Email *", font=(font_style, 16))
         Email_label.place(x=40, y=390)
         Email_entry = ctk.CTkEntry(edit_profile_page, width=330)
         Email_entry.place(x=40, y=415)
 
         # Create function button for end user menu
         change_button = ctk.CTkButton(edit_profile_page, text="Done", command=change_button_function,
-                                    font=("Helvetica", 12, "bold"))
+                                    font=(font_style, 12))
         change_button.place(x=40, y=500)
 
         
@@ -1158,7 +1169,7 @@ def end_user_dashboard_function(user_email):
         change_button_page.place(x=150, y=0)
 
         # creating current password label and entry box
-        current_password_label = ctk.CTkLabel(change_button_page, text="Your Current Password", font=("Helvetica", 20, "bold"))
+        current_password_label = ctk.CTkLabel(change_button_page, text="Your Current Password", font=(font_style, 23))
         current_password_label.place(x=120, y=80)
 
         current_password_entry = ctk.CTkEntry(change_button_page, width=300, show="*")
@@ -1166,12 +1177,12 @@ def end_user_dashboard_function(user_email):
 
         current_password_shown_check = ctk.CTkCheckBox(change_button_page, text="Show Password", 
                                         command=lambda:show_hide_password(current_password_entry),
-                                        font=("Helvetica", 8))
+                                        font=(font_style, 10))
         current_password_shown_check.place(x=400, y=130)
 
 
         # creating new password label and entry box
-        new_password_label = ctk.CTkLabel(change_button_page, text="Your New Password", font=("Helvetica", 20, "bold"))
+        new_password_label = ctk.CTkLabel(change_button_page, text="Your New Password", font=(font_style, 23))
         new_password_label.place(x=120, y=190)
 
         new_password_entry = ctk.CTkEntry(change_button_page, width=300, show="*")
@@ -1179,12 +1190,12 @@ def end_user_dashboard_function(user_email):
 
         new_password_shown_check = ctk.CTkCheckBox(change_button_page, text="Show Password", 
                                         command=lambda:show_hide_password(new_password_entry), 
-                                        font=("Helvetica", 8))
+                                        font=(font_style, 10))
         new_password_shown_check.place(x=400, y=240)
 
 
         # creating confirm new password label and entry box
-        confirm_new_password_label = ctk.CTkLabel(change_button_page, text="Confirm New Password", font=("Helvetica", 20, "bold"))
+        confirm_new_password_label = ctk.CTkLabel(change_button_page, text="Confirm New Password", font=(font_style, 23))
         confirm_new_password_label.place(x=120, y=300)
 
         confirm_new_password_entry = ctk.CTkEntry(change_button_page, width=300, show="*")
@@ -1192,13 +1203,13 @@ def end_user_dashboard_function(user_email):
 
         confirm_password_shown_check = ctk.CTkCheckBox(change_button_page, text="Show Password", 
                                         command=lambda:show_hide_password(confirm_new_password_entry),
-                                        font=("Helvetica", 8))
+                                        font=(font_style, 10))
         confirm_password_shown_check.place(x=400, y=340)     
 
 
         # create register button
         confirm_button = ctk.CTkButton(change_button_page, text="Confirm", command=confirm_button,
-                                        font=("Helvetica", 12, "bold"))
+                                        font=(font_style, 12))
         confirm_button.place(x=150, y=450)   
 
         
@@ -1221,34 +1232,57 @@ def end_user_dashboard_function(user_email):
     end_user_dashboard.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     # menu frame of end user dashboard
-    end_user_menu = ctk.CTkFrame(master=end_user_dashboard, width=150, height=600, border_color="black", border_width=1.5)
+    end_user_menu = ctk.CTkFrame(master=end_user_dashboard, width=150, height=600, fg_color="#ECE9EE")
     end_user_menu.place(relx=0, rely=0)
 
     # Create funtion button for end user menu
     end_user_home_button = ctk.CTkButton(end_user_menu, text="Home", 
                                          command=lambda: navigate_to_home_page(user_email),
-                                        font=("Helvetica", 12, "bold"))
-    end_user_home_button.place(x=5, y=200)
+                                        font=(font_style, 12))
+    end_user_home_button.place(x=5, y=150)
 
 
     end_user_edit_button = ctk.CTkButton(end_user_menu, text="Edit Profile", 
                                          command=lambda: navigate_to_edit_profile_page(user_email),
-                                        font=("Helvetica", 12, "bold"))
-    end_user_edit_button.place(x=5, y=250)
+                                        font=(font_style, 12))
+    end_user_edit_button.place(x=5, y=190)
 
 
     end_user_change_password_button = ctk.CTkButton(end_user_menu, text="Change Password", 
                                                     command=lambda: navigate_to_change_password_page(user_email),
-                                                    font=("Helvetica", 12, "bold"))
-    end_user_change_password_button.place(x=5, y=300)
+                                                    font=(font_style, 12))
+    end_user_change_password_button.place(x=5, y=230)
 
 
     end_user_logout_button = ctk.CTkButton(end_user_menu, text="Logout", 
                                            command=lambda: navigate_to_logout_page(user_email),
-                                            font=("Helvetica", 12, "bold"))
-    end_user_logout_button.place(x=5, y=450)
+                                            font=(font_style, 12))
+    end_user_logout_button.place(x=5, y=500)
 
-    end_user_edit_button_function(user_email)
+    # load picture 1
+    pic_1 = ctk.CTkImage(light_image=Image.open("pic_1.jpg"), 
+                                    dark_image=Image.open("pic_1.jpg"), size=(140, 70))
+    
+    # Create a label to display the profile picture
+    profile_picture_label = ctk.CTkLabel(end_user_menu, image=pic_1, text="")
+    profile_picture_label.image = pic_1
+    profile_picture_label.place(x=5, y=30)
+    
+    # load picture 2   
+    pic_2 = ctk.CTkImage(light_image=Image.open("pic_2.jpg"), 
+                        dark_image=Image.open("pic_2.jpg"), size=(140, 140))
+    
+    # Create a label to display the profile picture
+    profile_picture_label = ctk.CTkLabel(end_user_menu, image=pic_2, text="")
+    profile_picture_label.image = pic_2
+    profile_picture_label.place(x=5, y=300)
+    
+    end_user_home_button_function(user_email)
 
-registration_page_function()
+
+font_style = "Congenial"
+
+
+# Invocate the first page of the system (Login Page)
+Login_page_function()
 app.mainloop()
