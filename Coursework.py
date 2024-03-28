@@ -1022,8 +1022,8 @@ def end_user_dashboard_function(user_email):
             if file_path:
                 _, file_extension = os.path.splitext(file_path)
                 # Validate file type
-                if file_extension.lower() not in ['.jpg', '.jpeg', '.png']:
-                    print("Invalid file type. Please upload a JPG or PNG file.")
+                if file_extension.lower() not in [".jpg", ".png"]:
+                    print("Invalid file type. Please upload a JPG file.")
                     return
 
                 # Create directory if it doesn't exist
@@ -1033,8 +1033,11 @@ def end_user_dashboard_function(user_email):
 
                 # Check if a picture with the same user ID already exists
                 existing_picture_path = os.path.join(picture_directory, f"{user_id}{file_extension}")
+                print(existing_picture_path)
                 if os.path.exists(existing_picture_path):
-                    os.remove(existing_picture_path)  # Delete the existing picture
+                    print(existing_picture_path)
+
+                    os.replace(existing_picture_path)  # Delete the existing picture
 
                 new_file_name = f"{user_id}{file_extension}"
                 new_file_path = os.path.join(picture_directory, new_file_name)
