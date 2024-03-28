@@ -627,14 +627,6 @@ def system_user_dashboard_function():
         draw_rectangle_for_monthly_new_users(canvas_for_monthly_new_users)
         draw_rectangle_for_total_end_users(canvas_for_total_end_users)
 
-        # load picture    
-        sys_pic_1 = ctk.CTkImage(light_image=Image.open("sys_pic_1.jpg"), 
-                            dark_image=Image.open("sys_pic_1.jpg"), size=(300, 200))
-        
-        # Create a label to display the picture
-        profile_picture_label = ctk.CTkLabel(home_page, image=sys_pic_1, text="")
-        profile_picture_label.image = sys_pic_1
-        profile_picture_label.place(x=80, y=300)
 
     # Function of search button in system user dashboard
     def system_user_search_button_function():
@@ -1261,24 +1253,6 @@ def end_user_dashboard_function(user_email):
                                            command=lambda: navigate_to_logout_page(user_email),
                                             font=(font_style, 12))
     end_user_logout_button.place(x=5, y=500)
-
-    # load picture 1
-    pic_1 = ctk.CTkImage(light_image=Image.open("pic_1.jpg"), 
-                                    dark_image=Image.open("pic_1.jpg"), size=(140, 70))
-    
-    # Create a label to display the profile picture
-    profile_picture_label = ctk.CTkLabel(end_user_menu, image=pic_1, text="")
-    profile_picture_label.image = pic_1
-    profile_picture_label.place(x=5, y=30)
-    
-    # load picture 2   
-    pic_2 = ctk.CTkImage(light_image=Image.open("pic_2.jpg"), 
-                        dark_image=Image.open("pic_2.jpg"), size=(140, 140))
-    
-    # Create a label to display the profile picture
-    profile_picture_label = ctk.CTkLabel(end_user_menu, image=pic_2, text="")
-    profile_picture_label.image = pic_2
-    profile_picture_label.place(x=5, y=300)
     
     end_user_home_button_function(user_email)
 
